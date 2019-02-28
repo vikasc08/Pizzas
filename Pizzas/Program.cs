@@ -23,15 +23,17 @@ namespace Pizzas
             {
                 //Get the JSON Token value for each JObject
                 item.TryGetValue("toppings", out JToken value);
+                var key = FormatString(value.ToString());
+
 
                 //If the JSON Token already exists, get the value of the Token and increment else add new pair to the collection
-                if (Pizzas.ContainsKey(value.ToString()))
+                if (Pizzas.ContainsKey(key))
                 {
-                    Pizzas.TryGetValue(value.ToString(), out int currentCount);
-                    Pizzas[value.ToString()] = currentCount + 1;
+                    Pizzas.TryGetValue(key, out int currentCount);
+                    Pizzas[key] = currentCount+1;
                 }
                 else
-                    Pizzas.Add(value.ToString(), 1);
+                    Pizzas.Add(key, 1);
             }
 
             //Selecting the Top 20 from the collection in Descending order of the value
@@ -39,10 +41,24 @@ namespace Pizzas
                         .Take(20);
             int Rank = 1;
             foreach (var item in top20)
-            {                
+            {
                 Console.WriteLine(@"Popular Pizza Toppings: {0}, Count of Orders: {1}, Rank: {2}", item.Key, item.Value, Rank);
                 Rank++;
-            }                   
+            }
+        }
+
+        public static string FormatString(string key)
+        {
+            key = string.Join("", System.Text.RegularExpressions.Regex.Split(key, @"(?:\r\n|\n\r|\n|\r|\[|\])"));
+            string[] stringArray = key.Split(',');
+            Array.Sort(stringArray);
+            string returnValue = "";
+            for (int i = stringArray.GetLowerBound(0); i <= stringArray.GetUpperBound(0); i++)
+            {
+                returnValue = returnValue + stringArray[i].Trim() + ",";
+            }
+            return returnValue.Remove(returnValue.Length - 1, 1);
+            //return key.Trim();
         }
     }
 }
